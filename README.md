@@ -70,24 +70,6 @@ so an edit that replaces a file, rather than writing through the same inode,
 leaves the installed copy behind. Re-run the install after editing this package,
 or use a `link:` specifier while iterating.
 
-## How the pi extension's hooks became DSH
-
-| pi | DSH |
-|---|---|
-| `before_agent_start` appending the prompt | one `ctx.systemPrompt.section()` owned by the plugin fiber |
-| `registerTool` + `promptSnippet` | `ctx.tools.register()`; DSH has no `promptSnippet`, so the standing guidance lives in the prompt section |
-| `terminate: true` on the closing tool result | **deliberately not** `exec.concludeTurn()` — see below |
-| `pi.sendMessage({ display: true })` for the closed entry | a durable `user/message` carrying `source.form: 'notice'` — the restart-safe record, deliberately not shown as a transcript row |
-| `ctx.ui.setWidget` for the read-only banner | the browser half's composer block: the input box locks itself and its placeholder carries the copy |
-| `ctx.ui.notify` | nothing; a host plugin has no toast surface, and a card was tried and removed |
-| the `input` hook that blocked non-slash input | an `agent/pre-step` listener returning `{ kind: 'reject' }`, kept only as the backstop behind the locked box |
-| a persisted `pi.appendEntry` marker | the same notice, whose `source` carries `closed`, `strikes`, `modelId` and `trigger` |
-
-Closing is a presentation problem, not a filtering problem: the input box locks,
-so there is normally nothing left to filter. The gate stays because DSH's own
-composer block is documented as "an affordance, not enforcement" — a prompt
-arriving from another client still cannot reach the model.
-
 ## License
 
 MIT.
