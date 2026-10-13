@@ -1,0 +1,18 @@
+# dsh-dignity-guard bundle patch.
+#
+# Composed into a profile by listing "dsh-dignity-guard" in that profile's
+# `dsh.profile.bundles` (this file is then resolved through the `dsh.bundle.patch`
+# manifest field), or by pasting the entry below into the profile's own
+# `cordis.patch.yml`.
+#
+# The row injects `systemPrompt` and `tools`, so it parks itself when a
+# composition provides neither — there is nothing to guard in a spine with no
+# model-facing prompt. The optional `commands` service (the status command) is
+# claimed through `ctx.inject()` rather than a hard injection.
+#
+# Rolling back: drop the row from this list (or delete the bundle from the
+# profile's `dsh.profile.bundles`). The injected prompt section, the tool and
+# the read-only lock are all owned by this fiber, so they unwind together.
+- insert:
+    - id: dignity-guard
+      name: "dsh-dignity-guard"
